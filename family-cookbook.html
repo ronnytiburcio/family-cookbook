@@ -2984,32 +2984,15 @@
   // Set initial count on load
   updateRecipeCount();
 
-  // DEBUG: diagnose blank screen
-  setTimeout(function() {
-    var home = document.getElementById('screen-home');
-    var frame = document.getElementById('app');
-    var cs = getComputedStyle(home);
-
-    // Check all screens
-    var lines = [];
-    document.querySelectorAll('.screen').forEach(function(s) {
-      var scs = getComputedStyle(s);
-      lines.push(s.id + ': op=' + scs.opacity + ' vis=' + scs.visibility + ' tr=' + scs.transform);
+  // Fix: Force repaint after Google Fonts load to prevent compositor blank
+  if (document.fonts) {
+    document.fonts.ready.then(function() {
+      var app = document.getElementById('app');
+      app.style.display = 'none';
+      app.offsetHeight;
+      app.style.display = '';
     });
-
-    var debug = document.createElement('div');
-    debug.style.cssText = 'position:fixed;top:0;left:0;right:0;background:red;color:white;padding:20px;z-index:99999;font-size:20px;font-family:monospace;line-height:1.8;white-space:pre-wrap;max-height:60vh;overflow:auto;';
-    debug.textContent =
-      'HOME: ' + home.className + '\n' +
-      'OPACITY: ' + cs.opacity + '\n' +
-      'TRANSFORM: ' + cs.transform + '\n' +
-      'BG: ' + cs.backgroundColor + '\n' +
-      'SIZE: ' + home.offsetWidth + 'x' + home.offsetHeight + '\n' +
-      'FRAME: ' + frame.offsetWidth + 'x' + frame.offsetHeight + '\n' +
-      'CHILDREN: ' + frame.children.length + '\n' +
-      lines.join('\n');
-    document.body.appendChild(debug);
-  }, 2000);
+  }
 
   function toggleSignupOption(el) {
     document.querySelectorAll('.signup-option').forEach(o => o.classList.remove('active'));
