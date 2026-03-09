@@ -69,6 +69,9 @@
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
+  }
+
+  .screen.transitioning {
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -2940,6 +2943,10 @@
     const current = document.getElementById('screen-' + currentScreen);
     const next = document.getElementById('screen-' + target);
 
+    // Enable transitions for navigation
+    current.classList.add('transitioning');
+    next.classList.add('transitioning');
+
     // Determine direction
     const screens = ['home', 'signin', 'signup', 'toc', 'recipe', 'add', 'family', 'profile', 'settings'];
     const isForward = screens.indexOf(target) > screens.indexOf(currentScreen) ||
@@ -2949,11 +2956,11 @@
     next.scrollTop = 0;
 
     if (isForward) {
-      current.className = 'screen screen-' + currentScreen + ' hidden-left';
-      next.className = 'screen screen-' + target + ' active';
+      current.className = 'screen screen-' + currentScreen + ' transitioning hidden-left';
+      next.className = 'screen screen-' + target + ' transitioning active';
     } else {
-      current.className = 'screen screen-' + currentScreen + ' hidden';
-      next.className = 'screen screen-' + target + ' active';
+      current.className = 'screen screen-' + currentScreen + ' transitioning hidden';
+      next.className = 'screen screen-' + target + ' transitioning active';
     }
 
     // Re-trigger animations
