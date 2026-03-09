@@ -36,15 +36,35 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    min-height: 100dvh;
     overflow: hidden;
   }
 
+  /* On mobile, remove centering and let app fill screen */
+  @media (max-width: 430px) {
+    body {
+      align-items: stretch;
+      justify-content: stretch;
+    }
+  }
+
   .phone-frame {
-    width: 390px;
-    height: 844px;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
     position: relative;
     overflow: hidden;
     background: var(--cream);
+  }
+
+  /* Desktop: show as phone mockup */
+  @media (min-width: 431px) {
+    .phone-frame {
+      width: 390px;
+      height: 844px;
+      border-radius: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
   }
 
   /* Paper texture overlay */
@@ -57,11 +77,18 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   }
 
+  /* Prevent transitions on initial page load */
+  .no-transitions .screen {
+    transition: none !important;
+  }
+
   /* ========== SCREENS ========== */
   .screen {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
+    opacity: 0;
+    transform: translateX(100%);
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform, opacity;
   }
@@ -2058,7 +2085,7 @@
 </style>
 </head>
 <body>
-<div class="phone-frame" id="app">
+<div class="phone-frame no-transitions" id="app">
   <div class="paper-texture"></div>
 
   <!-- ===== HOME / COVER ===== -->
@@ -2971,6 +2998,13 @@
 
   // Set initial count on load
   updateRecipeCount();
+
+  // Enable transitions after initial render is stable
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.getElementById('app').classList.remove('no-transitions');
+    });
+  });
 
   function toggleSignupOption(el) {
     document.querySelectorAll('.signup-option').forEach(o => o.classList.remove('active'));
