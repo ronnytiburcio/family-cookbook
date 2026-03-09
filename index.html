@@ -69,27 +69,12 @@
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
+    overflow-y: auto;
   }
 
-  .screen.transitioning {
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .screen.hidden {
-    transform: translateX(100%);
-    opacity: 0;
-    pointer-events: none;
-  }
-
+  .screen.hidden,
   .screen.hidden-left {
-    transform: translateX(-30%);
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .screen.active {
-    transform: none;
-    opacity: 1;
+    display: none;
   }
 
   /* ========== HOME / COVER SCREEN ========== */
@@ -2930,7 +2915,7 @@
   const initScreen = urlParams.get('screen') || 'home';
 
   if (initScreen !== 'home') {
-    document.getElementById('screen-home').className = 'screen screen-home hidden-left';
+    document.getElementById('screen-home').className = 'screen screen-home hidden';
     document.getElementById('screen-' + initScreen).className = 'screen screen-' + initScreen + ' active';
   }
 
@@ -2943,33 +2928,10 @@
     const current = document.getElementById('screen-' + currentScreen);
     const next = document.getElementById('screen-' + target);
 
-    // Enable transitions for navigation
-    current.classList.add('transitioning');
-    next.classList.add('transitioning');
-
-    // Determine direction
-    const screens = ['home', 'signin', 'signup', 'toc', 'recipe', 'add', 'family', 'profile', 'settings'];
-    const isForward = screens.indexOf(target) > screens.indexOf(currentScreen) ||
-                      (currentScreen === 'home');
-
-    // Reset scroll
+    // Hide current, show next
+    current.className = 'screen screen-' + currentScreen + ' hidden';
+    next.className = 'screen screen-' + target + ' active';
     next.scrollTop = 0;
-
-    if (isForward) {
-      current.className = 'screen screen-' + currentScreen + ' transitioning hidden-left';
-      next.className = 'screen screen-' + target + ' transitioning active';
-    } else {
-      current.className = 'screen screen-' + currentScreen + ' transitioning hidden';
-      next.className = 'screen screen-' + target + ' transitioning active';
-    }
-
-    // Re-trigger animations
-    const animElements = next.querySelectorAll('.animate-in');
-    animElements.forEach(el => {
-      el.style.animation = 'none';
-      el.offsetHeight; // Force reflow
-      el.style.animation = '';
-    });
 
     currentScreen = target;
     screenHistory.push(target);
@@ -2984,15 +2946,6 @@
   // Set initial count on load
   updateRecipeCount();
 
-  // Fix: Force repaint after Google Fonts load to prevent compositor blank
-  if (document.fonts) {
-    document.fonts.ready.then(function() {
-      var app = document.getElementById('app');
-      app.style.display = 'none';
-      app.offsetHeight;
-      app.style.display = '';
-    });
-  }
 
   function toggleSignupOption(el) {
     document.querySelectorAll('.signup-option').forEach(o => o.classList.remove('active'));
